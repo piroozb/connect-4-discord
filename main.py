@@ -39,8 +39,11 @@ async def play(ctx):
     board = Board()
     send_board = board.print_board()
     message = await ctx.send(send_board)
-    # for emoji in EMOTES: idk what this does
-    #     await message.add_reaction(emoji)
+    # idk what this does <- it reacts to the message with the seven emotes;
+    # this is so that the players can click on the reactions rather than
+    # having to add the reactions themselves
+    for emoji in EMOTES:
+        await message.add_reaction(emoji)
 
     reaction = await client.add_reaction()
     c = await on_reaction_add(reaction, player1)
@@ -51,7 +54,7 @@ async def play(ctx):
 async def on_reaction_add(reaction, user) -> Optional[int]:
     """
     Check which reaction role was pressed from positions 0-5 on EMOTES.
-    :return: The corresponding number to that reaction, which is column <c>.
+    The corresponding number to that reaction, which is column <c>.
     """
     channel_id = 3123122  # ur channel id, not real.
     if reaction.message.channel.id != channel_id:

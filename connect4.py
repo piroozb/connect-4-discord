@@ -10,15 +10,11 @@ board_piece = {'*': ':blue_circle: ', 'R': ':red_circle: ',
 
 
 class Board:
-    """A recursive tree data structure.
-
-    Note the relationship between this class and RecursiveList; the only major
-    difference is that _rest has been replaced by _subtrees to handle multiple
-    recursive sub-parts.
+    """The board for the connect 4 game
     """
     # === Private Attributes ===
     # The array representing the game board.
-    _arr: List[str]
+    _arr: List[List[str]]
 
     # === Representation Invariants ===
     # - If arr is None then self._arr is an empty 7x6 board.
@@ -27,21 +23,14 @@ class Board:
     def __init__(self) -> None:
         """Initialize a Board with empty (blue) circles.
         self._arr is an empty 7x6 board.
-        >>> b = Board()
-        >>> b._arr
-        [['*', '*', '*', '*','*', '*', '*'],
-        ['*', '*', '*', '*','*', '*', '*'],
-        ['*', '*', '*', '*','*', '*', '*'],
-        ['*', '*', '*', '*','*', '*', '*'],
-        ['*', '*', '*', '*','*', '*', '*'],
-        ['*', '*', '*', '*','*', '*', '*'],]
         """
         arr = _create_board()
         self._arr = arr
 
-    def empty_board(self):
-        for i in range(len(self._arr)):
-            self._arr[i] = "*"
+    def empty_board(self) -> None:
+        for r in range(len(self._arr)):
+            for c in range(len(self._arr[r])):
+                self._arr[r][c] = "*"
 
     def print_board(self) -> str:
         msg = ''
@@ -94,10 +83,10 @@ class Board:
 
     def current_row(self) -> int:
         """
-
-        :return: Current row the board is at, which is len of list.
+        Current row the board is at, which is len of list.
         """
         return self._arr.__len__()
+
 
 # Helpers
 def _create_board():
