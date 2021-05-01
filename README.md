@@ -3,7 +3,7 @@
 </p>
 <h3 align="center">
    An open sourced connect 4 discord bot. <br/>
-   <a href="https://discord.com/api/oauth2/authorize?client_id=837837082948534272&permissions=519232&scope=bot">Invite this bot<a>
+   <a href="https://discord.com/api/oauth2/authorize?client_id=837837082948534272&permissions=519232&scope=bot">Invite this bot</a>
 </h3>
   
 ### Play against others or our bot!
