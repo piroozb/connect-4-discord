@@ -1,4 +1,11 @@
-# Connect 4 Discord Bot [Invite this bot](https://discord.com/api/oauth2/authorize?client_id=837837082948534272&permissions=519232&scope=bot)
+<p align="center">
+   <img src="https://i.imgur.com/VXyhDy2.png" width="350" alt=".connect 4 logo">
+</p>
+<h3 align="center">
+   An open sourced connect 4 discord bot.
+</h3>
+<a href="https://discord.com/api/oauth2/authorize?client_id=837837082948534272&permissions=519232&scope=bot">Invite this bot
+  
 ### Play against others or our bot!
 
 ## Try it yourself!
