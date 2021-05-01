@@ -2,9 +2,9 @@
    <img src="https://i.imgur.com/UAO21hM.png" width="500" alt=".connect 4 logo">
 </p>
 <h3 align="center">
-   An open sourced connect 4 discord bot.
+   An open sourced connect 4 discord bot. <br/>
+   <a href="https://discord.com/api/oauth2/authorize?client_id=837837082948534272&permissions=519232&scope=bot">Invite this bot
 </h3>
-<a href="https://discord.com/api/oauth2/authorize?client_id=837837082948534272&permissions=519232&scope=bot">Invite this bot
   
 ### Play against others or our bot!
 
