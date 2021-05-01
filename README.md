@@ -1,5 +1,5 @@
 <p align="center">
-   <img src="https://i.imgur.com/VXyhDy2.png" width="500" alt=".connect 4 logo">
+   <img src="https://i.imgur.com/UAO21hM.png" width="500" alt=".connect 4 logo">
 </p>
 <h3 align="center">
    An open sourced connect 4 discord bot.
