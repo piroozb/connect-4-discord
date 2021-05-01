@@ -1,6 +1,6 @@
 # Connect 4 Discord Bot
 
-## Play against others or against our bot!
+### Play against others or against our bot!
 
 ## Try it yourself!
 To set up, download the files and then install the packages dotenv, discord.py, and flask.  
