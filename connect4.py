@@ -1,5 +1,12 @@
+"""
+This file contains functions related to the connect 4 game and board.
+"""
+from typing import List
+
 ROW_COUNT = 6
 COL_COUNT = 7
+board_piece = {'*': ':blue_circle: ', 'R': ':red_circle: ',
+               'Y': ':yellow_circle: '}
 
 
 def create_board():
@@ -8,12 +15,12 @@ def create_board():
 
 
 # for piece can use i from other function
-def winning_move(board, piece):
+def winning_move(board, piece) -> bool:
 
     for c in range(COL_COUNT):
         for r in range(ROW_COUNT):
             if c <= COL_COUNT - 3:
-                # Horizontal WINS
+                # Horizontal Wins
                 if (board[r][c] == board[r][c+1] == board[r][c+2]
                         == board[r][c+3] == piece):
                     return True
@@ -35,6 +42,7 @@ def winning_move(board, piece):
                 if board[r][c] == board[r-1][c+1] == board[r-2][c+2] == \
                         board[r-3][c+3] == piece:
                     return True
+    return False
 
 
 def empty_board(arr):
@@ -42,18 +50,13 @@ def empty_board(arr):
         arr[i] = "*"
 
 
-def print_board(arr):
-    pass
-    # printed = 0
-    # str = ''
-    # for i in arr:
-    #     str += i + " "
-    #     printed += 1
-    #     if printed == COL_COUNT:
-    #         print(str)
-    #         printed = 0
-    #         str = ''
-    # print("\n")
+def print_board(board: List[list]) -> str:
+    msg = ''
+    for row in board:
+        for item in row:
+            msg += board_piece[item]
+        msg += '\n'
+    return msg
 
 
 def drop_piece(arr, r, c, piece):
