@@ -27,11 +27,6 @@ class Board:
         arr = _create_board()
         self._arr = arr
 
-    def empty_board(self) -> None:
-        for r in range(len(self._arr)):
-            for c in range(len(self._arr[r])):
-                self._arr[r][c] = "*"
-
     def print_board(self) -> str:
         msg = ''
         for row in self._arr:
@@ -40,26 +35,26 @@ class Board:
             msg += '\n'
         return msg
 
-    def drop_piece(self, r: int, c: int, piece):
-        self._arr[r][c] = piece
-
-    def is_valid_location(self, col):
-        if self._arr[col] == '*':
+    def is_valid_location(self, r: int, c: int):
+        if self._arr[r][c] == '*':
             return True
         return False
+
+    def drop_piece(self, r: int, c: int, piece):
+        self._arr[r][c] = piece
 
     # for piece can use i from other function
     def winning_move(self, piece) -> bool:
         for c in range(COL_COUNT):
             for r in range(ROW_COUNT):
-                if c <= COL_COUNT - 3:
+                if c < COL_COUNT - 3:
                     # Horizontal Wins
                     if (self._arr[r][c] == self._arr[r][c + 1] == self._arr[r][
                         c + 2]
                             == self._arr[r][c + 3] == piece):
                         return True
 
-                if r <= ROW_COUNT - 3:
+                if r < ROW_COUNT - 3:
                     # Vertical Wins
                     if self._arr[r][c] == self._arr[r + 1][c] == \
                             self._arr[r + 2][c] == \
@@ -67,14 +62,14 @@ class Board:
                         return True
 
                 # Positive Diagonal Wins
-                if c <= COL_COUNT - 3 and r <= ROW_COUNT - 3:
+                if c < COL_COUNT - 3 and r < ROW_COUNT - 3:
                     if self._arr[r][c] == self._arr[r + 1][c + 1] == \
                             self._arr[r + 2][c + 2] == \
                             self._arr[r + 3][c + 3] == piece:
                         return True
 
                 # Negative Diagonal Wins
-                if c <= COL_COUNT - 3 and 3 <= r < ROW_COUNT:
+                if c < COL_COUNT - 3 and 3 <= r < ROW_COUNT:
                     if self._arr[r][c] == self._arr[r - 1][c + 1] == \
                             self._arr[r - 2][c + 2] == \
                             self._arr[r - 3][c + 3] == piece:
@@ -90,5 +85,9 @@ class Board:
 
 # Helpers
 def _create_board():
-    arr = [['*'] * 7] * 6
+    arr = [['*'] * 7 for _ in range(6)]
     return arr
+
+
+if __name__ == '__main__':
+    pass
