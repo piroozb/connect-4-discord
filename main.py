@@ -1,5 +1,5 @@
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 import os
 from dotenv import load_dotenv
 from keep_alive import keep_alive
@@ -20,9 +20,11 @@ EMOTES = {'1️⃣': 0, '2️⃣': 1, '3️⃣': 2, '4️⃣': 3, '5️⃣': 4, 
 TOP_NUM = '** **\n:one: :two: :three: :four: :five: :six: :seven: \n'
 # dictionary to keep track of where the game is happening
 IDS = {}
+# what index stands for what in IDS
+BRD, P1, P2, CURR_P, TIMER, CHAN = 0, 1, 2, 3, 4, 5
 # to differentiate between both players
-P_DICT = {True: [1, 'R', discord.Colour.red()],
-          False: [2, 'Y', discord.Colour.gold()]}
+P_DICT = {True: [P1, 'R', discord.Colour.red()],
+          False: [P2, 'Y', discord.Colour.gold()]}
 # list of gifs to send when a player wins
 GIFS = []
 gif_file = open("win_gifs.txt", "r")
@@ -36,8 +38,25 @@ while content != '':
 async def on_ready():
     """Sends messages once bot connects and sets bot activity"""
     print(f'{client.user} has connected to Discord!')
+    afk.start()
     await client.change_presence(activity=discord.Game(' connect 4 '
                                                        '| 4help'))
+
+
+@tasks.loop(seconds=60)
+async def afk():
+    remove = []
+    for key in IDS:
+        if IDS[key][TIMER] == 240:
+            channel = IDS[key][CHAN]
+            await channel.send(f'{IDS[key][P1].display_name} :crossed_swords:'
+                               f' {IDS[key][P2].display_name}: '
+                               f'Game ended due to inactivity')
+            remove.append(key)
+        else:
+            IDS[key][TIMER] += 1
+    for key in remove:
+        del IDS[key]
 
 
 @client.command()
@@ -61,8 +80,8 @@ async def play(ctx):
     if len(ctx.message.mentions) == 0 or ctx.message.mentions[0].bot:
         await ctx.send('Mention a person!')
         return None
-    player1 = ctx.author
     player2 = ctx.message.mentions[0]
+    player1 = ctx.author
     board = Board()
     # Prints starting board
     message = await ctx.send(f'{player1.display_name} :crossed_swords: '
@@ -74,7 +93,7 @@ async def play(ctx):
     # the game to the global dictionary
     for emoji in EMOTES:
         await message.add_reaction(emoji)
-    IDS[message.id] = [board, player1, player2, 'R']
+    IDS[message.id] = [board, player1, player2, 'R', 0, ctx.channel]
 
 
 @client.event
@@ -82,15 +101,15 @@ async def on_reaction_add(reaction, user) -> None:
     """
     Check which reaction role was pressed and changes the board accordingly.
     """
-    channel = client.get_channel(reaction.message.channel.id)
     # If reaction is in a channel where no one is playing, or if the person
     # adding the reactions is the bot, do nothing.
     if reaction.message.id not in IDS or \
             user.id == 837837082948534272:
         return None
     curr_channel = IDS[reaction.message.id]
-    curr_piece = curr_channel[3]
-    curr_board = curr_channel[0]
+    channel = curr_channel[CHAN]
+    curr_piece = curr_channel[CURR_P]
+    curr_board = curr_channel[BRD]
     # for P_DICT
     player_red = True if curr_piece == 'R' else False
     curr_player = curr_channel[P_DICT[player_red][0]]
@@ -126,7 +145,7 @@ async def on_reaction_add(reaction, user) -> None:
     if user != curr_player:
         return None
     # changes current piece to next player
-    curr_channel[3] = P_DICT[not player_red][1]
+    curr_channel[CURR_P] = P_DICT[not player_red][1]
     r = 5
     # finds a valid location to drop the piece in starting from the bottom
     # of the column
@@ -134,6 +153,8 @@ async def on_reaction_add(reaction, user) -> None:
         r -= 1
     # drops the piece then edits the message to the updated board
     curr_board.drop_piece(r, EMOTES[reaction.emoji], curr_piece)
+    # reset afk timer
+    curr_channel[TIMER] = 0
     await reaction.message.edit(content=f'{curr_channel[1].display_name} '
                                         f':crossed_swords: '
                                         f'{curr_channel[2].display_name} \n' +
