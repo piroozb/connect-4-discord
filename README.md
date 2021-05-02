@@ -9,9 +9,11 @@
 ### Play against others or our bot!
 
 ## Technology used
+-   python
 -   discord.py
 -   flask
 -   google cloud (to run the bot)
+-   google drawings (for the logo)
 
 ## Try it yourself!
 To set up, download the files and then install the packages dotenv, discord.py, and flask.  
