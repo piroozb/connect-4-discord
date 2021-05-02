@@ -135,7 +135,10 @@ async def on_reaction_add(reaction, user) -> None:
     # Thus, we can directly cancel the game if one of the players forfeit.
     elif EMOTES[reaction.emoji] == 'F':
         del IDS[reaction.message.id]
-        embed = discord.Embed(title=f'{user.display_name} forfeited!',
+        embed = discord.Embed(title=f' {user.display_name} forfeited, '
+                                    f'{curr_channel[1].display_name}'
+                                    f' :crossed_swords: '
+                                    f'{curr_channel[2].display_name}',
                               color=discord.Colour.green())
         embed.set_image(url='https://media1.tenor.com/images/'
                             '8c3cb918305bf277589c6ad84dfcea53/tenor.gif')
