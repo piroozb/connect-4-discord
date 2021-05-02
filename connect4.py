@@ -1,5 +1,6 @@
 import random
 from typing import List, Dict
+import math
 
 ROW_COUNT = 6  # used to represent number of rows in a board
 COL_COUNT = 7  # used to represent number of columns in a board
@@ -83,59 +84,44 @@ class Board:
         Return the Score
         """
         score = 0
+        # Score center column
+        center_list = [self._board[r][COL_COUNT // 2] for r in range(ROW_COUNT)]
+        center_count = center_list.count(piece)
+        score += center_count * 6
+
         # Score Horizontal
         for r in range(ROW_COUNT):
             row = self._board[r]
             for c in range(COL_COUNT - 3):
                 section = row[c:c + 4]
-
-                if section.count(piece) == 4:
-                    score += 100
-                elif section.count(piece) == 3 and \
-                        section.count(EMPTY) == 1:
-                    score += 10
+                score += evaluate_section(section, piece)
 
         # Score Vertical
         for c in range(COL_COUNT):
             col = [self._board[r][c] for r in range(ROW_COUNT)]
             for r in range(ROW_COUNT - 3):
                 section = col[r:r + 4]
-
-                if section.count(piece) == 4:
-                    score += 100
-                elif section.count(piece) == 3 and \
-                        section.count(EMPTY) == 1:
-                    score += 10
+                score += evaluate_section(section, piece)
 
         # Score Positive Diagonal
         for r in range(ROW_COUNT - 3):
             for c in range(COL_COUNT - 3):
-                section = [self._board[r+i][c+i] for i in range(4)]
-
-                if section.count(piece) == 4:
-                    score += 100
-                elif section.count(piece) == 3 and \
-                        section.count(EMPTY) == 1:
-                    score += 10
+                section = [self._board[r + i][c + i] for i in range(4)]
+                score += evaluate_section(section, piece)
 
         # Score Negative Diagonal
         for r in range(ROW_COUNT - 3):
             for c in range(COL_COUNT - 3):
-                section = [self._board[r+3-i][c+i] for i in range(4)]
-
-                if section.count(piece) == 4:
-                    score += 100
-                elif section.count(piece) == 3 and \
-                        section.count(EMPTY) == 1:
-                    score += 10
+                section = [self._board[r + 3 - i][c + i] for i in range(4)]
+                score += evaluate_section(section, piece)
         return score
 
-    # def is_terminal_node(self, player_piece, ai_piece):
-    #     """
-    #     Return if the game is finished or if there are no valid locations left.
-    #     """
-    #     return self.is_win(player_piece) or \
-    #            self.is_win(ai_piece) or (len(self.get_valid_locations) == 0)
+    def is_terminal_node(self) -> bool:
+        """
+        Return if the game is finished or if there are no valid locations left.
+        """
+        return self.is_win(PLAYER_PIECE) or \
+            self.is_win(AI_PIECE) or (len(self.get_valid_locations()) == 0)
 
     def get_valid_locations(self) -> Dict[int, int]:
         """
@@ -168,6 +154,76 @@ class Board:
                 best_col_row = (col, row)
 
         return best_col_row
+
+    def minimax(self, depth, alpha, beta, maximizing_player) -> tuple:
+        valid_locations = self.get_valid_locations()
+        is_terminal = self.is_terminal_node()
+        if depth == 0 or is_terminal:
+            if is_terminal:
+                if self.is_win(AI_PIECE):
+                    return None, 100000000000000
+                elif self.is_win(PLAYER_PIECE):
+                    return None, -10000000000000
+                else:  # Game is over, no more valid moves
+                    return None, 0
+            else:  # Depth is zero
+                return None, self.score_position(AI_PIECE)
+
+        if maximizing_player:  # Maximizing player (for bot turn)
+            value = -math.inf
+            column = random.choice(list(valid_locations.keys()))
+            for col in valid_locations:
+                row = valid_locations[col]
+                temp_board = Board()
+                temp_board._board = [sublist.copy() for sublist in self._board]
+                temp_board.drop_piece(row, col, AI_PIECE)
+                new_score = temp_board.minimax(depth - 1, alpha, beta, False)[1]
+                if new_score > value:
+                    value = new_score
+                    column = col
+                alpha = max(alpha, value)
+                if alpha >= beta:
+                    break
+            return column, value
+
+        else:  # Minimizing player (for player turn)
+            value = math.inf
+            column = random.choice(list(valid_locations.keys()))
+            for col in valid_locations:
+                row = valid_locations[col]
+                temp_board = Board()
+                temp_board._board = [sublist.copy() for sublist in self._board]
+                temp_board.drop_piece(row, col, PLAYER_PIECE)
+                new_score = temp_board.minimax(depth - 1, alpha, beta, True)[1]
+                if new_score < value:
+                    value = new_score
+                    column = col
+                beta = min(beta, value)
+                if alpha >= beta:
+                    break
+            return column, value
+
+
+# Helper
+def evaluate_section(section: list, piece: str) -> int:
+    score = 0
+    opp_piece = PLAYER_PIECE
+    if piece == PLAYER_PIECE:
+        opp_piece = AI_PIECE
+
+    if section.count(piece) == 4:
+        score += 100
+    elif section.count(piece) == 3 and section.count(EMPTY) == 1:
+        score += 10
+    elif section.count(piece) == 2 and section.count(EMPTY) == 2:
+        score += 5
+
+    if section.count(opp_piece) == 3 and section.count(EMPTY) == 1:
+        score -= 8
+    elif section.count(opp_piece) == 4:
+        score -= 80
+
+    return score
 
 
 if __name__ == '__main__':

@@ -82,7 +82,7 @@ async def play(ctx):
             ctx.message.mentions[0] == ctx.author:
         await ctx.send(':x: ERROR: You cannot tag a bot or yourself. '
                        '\nEither tag another user you want to play with'
-                       ' or no one if you want to play with the bot.')
+                       ' or the bot/no one if you want to play with the bot.')
         return None
     else:
         player2 = ctx.message.mentions[0]
