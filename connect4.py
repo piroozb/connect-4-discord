@@ -1,6 +1,3 @@
-"""
-This file contains functions related to the connect 4 game and board.
-"""
 from typing import List
 
 ROW_COUNT = 6
@@ -16,9 +13,6 @@ class Board:
     # The array representing the game board.
     _arr: List[List[str]]
 
-    # === Representation Invariants ===
-    # - If arr is None then self._arr is an empty 7x6 board.
-
     # Methods
     def __init__(self) -> None:
         """Initialize a Board with empty (blue) circles.
@@ -28,6 +22,8 @@ class Board:
         self._arr = arr
 
     def print_board(self) -> str:
+        """Used to print the board with blue circles as empty areas,
+        red circles as player 1 moves, and yellow circles as player 2 moves"""
         msg = ''
         for row in self._arr:
             for item in row:
@@ -36,26 +32,30 @@ class Board:
         return msg
 
     def is_valid_location(self, r: int, c: int):
+        """Check if the section of the board is not already filled"""
         if self._arr[r][c] == '*':
             return True
         return False
 
     def drop_piece(self, r: int, c: int, piece):
+        """Drop piece of one of the players into the board"""
         self._arr[r][c] = piece
 
     # for piece can use i from other function
     def winning_move(self, piece) -> bool:
+        """Checks if there are any connect fours"""
         for c in range(COL_COUNT):
             for r in range(ROW_COUNT):
+
+                # Horizontal Wins
                 if c < COL_COUNT - 3:
-                    # Horizontal Wins
                     if (self._arr[r][c] == self._arr[r][c + 1] == self._arr[r][
                         c + 2]
                             == self._arr[r][c + 3] == piece):
                         return True
 
+                # Vertical Wins
                 if r < ROW_COUNT - 3:
-                    # Vertical Wins
                     if self._arr[r][c] == self._arr[r + 1][c] == \
                             self._arr[r + 2][c] == \
                             self._arr[r + 3][c] == piece:
