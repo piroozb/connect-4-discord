@@ -16,7 +16,7 @@ client = commands.Bot(command_prefix='4', case_insensitive=True)
 client.remove_command('help')
 
 EMOTES = {'1️⃣': 0, '2️⃣': 1, '3️⃣': 2, '4️⃣': 3, '5️⃣': 4, '6️⃣': 5, '7️⃣': 6}
-TOP_NUM = ':one: :two: :three: :four: :five: :six: :seven: \n'
+TOP_NUM = '** **\n:one: :two: :three: :four: :five: :six: :seven: \n'
 IDS = {}
 P_DICT = {True: [1, 'R', discord.Colour.red()],
           False: [2, 'Y', discord.Colour.gold()]}
@@ -53,6 +53,9 @@ async def help(ctx):
 
 @client.command()
 async def play(ctx):
+    if ctx.message.channel.id in IDS.keys():
+        await ctx.send(':x: ERROR: Someone is already playing in this channel')
+        return None
     player1 = ctx.author
     player2 = ctx.message.mentions[0]
     board = Board()
@@ -84,13 +87,16 @@ async def on_reaction_add(reaction, user) -> None:
     curr_channel = IDS[reaction.message.channel.id]
     curr_piece = curr_channel[3]
     curr_board = curr_channel[0]
-    await reaction.remove(user)
-    if curr_piece == 'R':
-        player_red = True
-    else:
-        player_red = False
+    player_red = True if curr_piece == 'R' else False
     curr_player = curr_channel[P_DICT[player_red][0]]
     other_player = curr_channel[P_DICT[not player_red][0]]
+    await reaction.remove(user)
+    channel = client.get_channel(reaction.message.channel.id)
+    if not curr_board.is_valid_location(0, EMOTES[reaction.emoji]):
+        await reaction.message.edit(content=TOP_NUM + curr_board.print_board() +
+                                    f':x: ERROR: Column full. :x:'
+                                    f'\n Current player: <@{curr_player.id}>')
+        return None
     if user != curr_player:
         return None
     curr_channel[3] = P_DICT[not player_red][1]
@@ -98,17 +104,16 @@ async def on_reaction_add(reaction, user) -> None:
     while not curr_board.is_valid_location(r, EMOTES[reaction.emoji]):
         r -= 1
     curr_board.drop_piece(r, EMOTES[reaction.emoji], curr_piece)
+    await reaction.message.edit(content=TOP_NUM + curr_board.print_board() +
+                                f'\n Current player: <@{other_player.id}>')
     if curr_board.winning_move(curr_piece):
         player = str(curr_player)
         curr_color = P_DICT[player_red][2]
         embed = discord.Embed(title=f'{player[:-5]} wins!',
                               color=curr_color)
-        channel = client.get_channel(reaction.message.channel.id)
         embed.set_image(url=random.choice(GIFS))
         await channel.send(embed=embed)
         del IDS[reaction.message.channel.id]
-    await reaction.message.edit(content=TOP_NUM + curr_board.print_board() +
-                                f'\n Current player: <@{other_player.id}>')
 
 
 keep_alive()
