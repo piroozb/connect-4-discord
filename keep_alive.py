@@ -1,3 +1,6 @@
+"""
+This file is necessary to keep the discord bot running 24/7.
+"""
 from flask import Flask
 from threading import Thread
 

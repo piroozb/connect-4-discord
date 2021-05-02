@@ -1,3 +1,6 @@
+"""
+This file contains all the functions relating to discord API calls.
+"""
 import discord
 from discord.ext import commands
 import os
