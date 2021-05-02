@@ -69,7 +69,8 @@ async def help(ctx):
     embed = discord.Embed(color=discord.Colour.green())
     embed.set_author(name='Help')
     embed.add_field(name='How to start playing connect 4',
-                    value='4play <user>; if no one is mentioned, the game will'
+                    value='4play <user>; if no one/the bot'
+                          ' is mentioned, the game will'
                           ' be played against the bot',
                     inline=False)
     await ctx.send(embed=embed)
