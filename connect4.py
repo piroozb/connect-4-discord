@@ -7,6 +7,8 @@ COL_COUNT = 7  # used to represent number of columns in a board
 EMPTY = '*'  # used to represent an empty part of the board
 board_piece = {EMPTY: ':blue_circle: ', 'R': ':red_circle: ',
                'Y': ':yellow_circle: '}
+PLAYER_PIECE = 'R'
+AI_PIECE = 'Y'
 
 
 class Board:
@@ -48,6 +50,7 @@ class Board:
     # for piece can use i from other function
     def is_win(self, piece: str) -> bool:
         """Checks if there are any connect fours"""
+
         for c in range(COL_COUNT):
             for r in range(ROW_COUNT):
 
