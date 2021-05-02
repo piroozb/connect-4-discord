@@ -4,7 +4,6 @@ import os
 from dotenv import load_dotenv
 from keep_alive import keep_alive
 from connect4 import Board
-from typing import Optional
 import random
 
 load_dotenv('.env')
@@ -77,10 +76,16 @@ async def play(ctx):
     adds it to IDS with message id as key, and a list with the board,
     player ids, and first move as the values"""
     # Doesn't start if no one or a bot is mentioned
-    if len(ctx.message.mentions) == 0 or ctx.message.mentions[0].bot:
-        await ctx.send('Mention a person!')
+    if len(ctx.message.mentions) == 0 or ctx.message.mentions[0] == client.user:
+        player2 = client.user
+    elif ctx.message.mentions[0].bot or \
+            ctx.message.mentions[0] == ctx.author:
+        await ctx.send(':x: ERROR: You cannot tag a bot or yourself. '
+                       '\nEither tag another user you want to play with'
+                       ' or no one if you want to play with the bot.')
         return None
-    player2 = ctx.message.mentions[0]
+    else:
+        player2 = ctx.message.mentions[0]
     player1 = ctx.author
     board = Board()
     # Prints starting board
@@ -133,11 +138,11 @@ async def on_reaction_add(reaction, user) -> None:
     # if the column is already filled, sends error message and does nothing
     # with the board
     if not curr_board.is_valid_location(0, EMOTES[reaction.emoji]):
-        await reaction.message.edit(content=f'{curr_channel[1].display_name} '
-                                            f':crossed_swords: '
-                                            f'{curr_channel[2].display_name} \n'
-                                            + TOP_NUM + curr_board.print_board()
-                                            + f':x: ERROR: Column full. :x:'
+        await reaction.message.edit(content=f'{curr_channel[1].display_name}'
+                                    f' :crossed_swords: '
+                                    f'{curr_channel[2].display_name} \n'
+                                    + TOP_NUM + curr_board.print_board()
+                                    + f':x: ERROR: Column full. :x:'
                                     f'\n Current player: <@{curr_player.id}>'
                                     f'\n :flag_white:: Forfeit')
         return None
@@ -155,26 +160,64 @@ async def on_reaction_add(reaction, user) -> None:
     curr_board.drop_piece(r, EMOTES[reaction.emoji], curr_piece)
     # reset afk timer
     curr_channel[TIMER] = 0
-    await reaction.message.edit(content=f'{curr_channel[1].display_name} '
-                                        f':crossed_swords: '
-                                        f'{curr_channel[2].display_name} \n' +
-                                        TOP_NUM + curr_board.print_board() +
-                                f'\n Current player: <@{other_player.id}>'
-                                f'\n :flag_white:: Forfeit')
     # Checks if player has won. If they did, sends a winner message
     # and then removes the board from IDS
-    if curr_board.winning_move(curr_piece):
+    if len(curr_board.get_valid_locations()) == 0:
+        del IDS[reaction.message.id]
+        embed = discord.Embed(title="It's a draw!",
+                              color=discord.Colour.red())
+        embed.set_image(url='https://media1.tenor.com/images/'
+                            '729fc07335063f9d8a23002a71fdb0a8/tenor.gif')
+        await channel.send(embed=embed)
+        return None
+    if curr_board.is_win(curr_piece):
         curr_color = P_DICT[player_red][2]
         embed = discord.Embed(title=f'{curr_player.display_name} wins!',
                               color=curr_color)
         embed.set_image(url=random.choice(GIFS))
         await channel.send(embed=embed)
         await reaction.message.edit(content=f'{curr_channel[1].display_name}'
-                                            f' :crossed_swords: '
-                                            f'{curr_channel[2].display_name}\n'
-                                            + TOP_NUM + curr_board.print_board()
-                                            + f'\n<@{curr_player.id}> wins!')
-        del IDS[reaction.channel.id]
+                                    f' :crossed_swords: '
+                                    f'{curr_channel[2].display_name}\n'
+                                    + TOP_NUM + curr_board.print_board()
+                                    + f'\n<@{curr_player.id}> wins!')
+        del IDS[reaction.message.id]
+        return None
+    else:
+        await reaction.message.edit(content=f'{curr_channel[1].display_name}'
+                                    f' :crossed_swords: '
+                                    f'{curr_channel[2].display_name} \n' +
+                                    TOP_NUM + curr_board.print_board() +
+                                    f'\n Current player: <@{other_player.id}>'
+                                    f'\n :flag_white:: Forfeit')
+    if other_player.bot:
+        c, r = curr_board.pick_best_move(curr_channel[CURR_P])
+        curr_board.drop_piece(r, c, P_DICT[not player_red][1])
+        curr_channel[TIMER] = 0
+        if curr_board.is_win(curr_channel[CURR_P]):
+            other_color = P_DICT[not player_red][2]
+            embed = discord.Embed(title=f'{other_player.display_name} wins!',
+                                  color=other_color)
+            embed.set_image(url=random.choice(GIFS))
+            await channel.send(embed=embed)
+            await reaction.message.edit(content=
+                                        f'{curr_channel[1].display_name}'
+                                        f' :crossed_swords: '
+                                        f'{curr_channel[2].display_name}\n'
+                                        + TOP_NUM + curr_board.print_board()
+                                        + f'\n<@{other_player.id}> wins!')
+            del IDS[reaction.message.id]
+        else:
+            await reaction.message.edit(content=
+                                        f'{curr_channel[1].display_name}'
+                                        f' :crossed_swords: '
+                                        f'{curr_channel[2].display_name} \n' +
+                                        TOP_NUM + curr_board.print_board() +
+                                        f'\n Current player:'
+                                        f' <@{curr_player.id}>'
+                                        f'\n :flag_white:: Forfeit')
+        # changes current piece back to what it was before
+        curr_channel[CURR_P] = curr_piece
 
 
 keep_alive()
