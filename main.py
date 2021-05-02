@@ -55,11 +55,8 @@ async def help(ctx):
 @client.command()
 async def play(ctx):
     """Starts a game with either a mentioned user or the bot and then
-    adds it to IDS with channel id, board, player ids, and first move"""
-    # Doesn't start a game if someone is already playing in that channel
-    if ctx.message.channel.id in IDS.keys():
-        await ctx.send(':x: ERROR: Someone is already playing in this channel')
-        return None
+    adds it to IDS with message id as key, and a list with the board,
+    player ids, and first move as the values"""
     # Doesn't start if no one or a bot is mentioned
     if len(ctx.message.mentions) == 0 or ctx.message.mentions[0].bot:
         await ctx.send('Mention a person!')
