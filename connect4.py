@@ -76,12 +76,6 @@ class Board:
                         return True
         return False
 
-    def current_row(self) -> int:
-        """
-        Current row the board is at, which is len of list.
-        """
-        return self._arr.__len__()
-
 
 # Helpers
 def _create_board():
