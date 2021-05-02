@@ -6,6 +6,7 @@ from keep_alive import keep_alive
 from connect4 import Board
 import math
 import random
+import asyncio
 
 load_dotenv('.env')
 
@@ -204,12 +205,10 @@ async def on_reaction_add(reaction, user) -> None:
                                               f'<@{other_player.id}>'
                                             f'\n :flag_white:: Forfeit')
     if other_player.bot:
-        # c, r = curr_board.pick_best_move(curr_channel[CURR_P])
-
+        await asyncio.sleep(1)
         col, minimax_score = curr_board.minimax(3, -math.inf, math.inf, True)
         row = curr_board.get_valid_locations()[col]
         if curr_board.is_valid_location(row, col):
-            # pygame.time.wait(500)
             curr_board.drop_piece(row, col, AI_PIECE)
             curr_channel[TIMER] = 0
 
