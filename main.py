@@ -210,7 +210,7 @@ async def on_reaction_add(reaction, user) -> None:
                                             f'\n :flag_white:: Forfeit')
     if other_player.bot:
         await asyncio.sleep(1)
-        col, minimax_score = curr_board.minimax(3, -math.inf, math.inf, True)
+        col, minimax_score = curr_board.minimax(4, -math.inf, math.inf, True)
         row = curr_board.get_valid_locations()[col]
         if curr_board.is_valid_location(row, col):
             curr_board.drop_piece(row, col, AI_PIECE)

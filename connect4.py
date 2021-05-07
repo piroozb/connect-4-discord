@@ -90,7 +90,7 @@ class Board:
         # Score center column
         center_list = [self._board[r][COL_COUNT // 2] for r in range(ROW_COUNT)]
         center_count = center_list.count(piece)
-        score += center_count * 6
+        score += center_count * 3
 
         # Score Horizontal
         for r in range(ROW_COUNT):
@@ -137,26 +137,6 @@ class Board:
                 if self.is_valid_location(r, c):
                     valid_locations[c] = r
         return valid_locations
-
-    def pick_best_move(self, piece: str) -> tuple:
-        """
-        Return a Tuple containing the column and row for the best move.
-        """
-        best_score = 0
-        valid_positions = self.get_valid_locations()
-        rnd = random.choice(list(valid_positions.keys()))
-        best_col_row = rnd, valid_positions[rnd]
-        for col in valid_positions:
-            temp_board = Board()
-            temp_board._board = [sublist.copy() for sublist in self._board]
-            row = valid_positions[col]
-            temp_board.drop_piece(row, col, piece)
-            score = temp_board.score_position(piece)
-            if score > best_score:
-                best_score = score
-                best_col_row = (col, row)
-
-        return best_col_row
 
     def minimax(self, depth, alpha, beta, maximizing_player) -> tuple:
         valid_locations = self.get_valid_locations()
@@ -215,7 +195,7 @@ def evaluate_section(section: list, piece: str) -> int:
         opp_piece = AI_PIECE
 
     if section.count(piece) == 4:
-        score += 100
+        score += 10000
     elif section.count(piece) == 3 and section.count(EMPTY) == 1:
         score += 10
     elif section.count(piece) == 2 and section.count(EMPTY) == 2:
@@ -224,7 +204,7 @@ def evaluate_section(section: list, piece: str) -> int:
     if section.count(opp_piece) == 3 and section.count(EMPTY) == 1:
         score -= 8
     elif section.count(opp_piece) == 4:
-        score -= 80
+        score -= 8000
 
     return score
 
