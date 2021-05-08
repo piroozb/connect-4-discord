@@ -12,7 +12,7 @@ load_dotenv('.env')
 
 PLAYER_PIECE = 'R'
 AI_PIECE = 'Y'
-
+BOT_ID = 837837082948534272
 # Prefix to call bot
 client = commands.Bot(command_prefix='4', case_insensitive=True)
 client.remove_command('help')  # Removes default help command
@@ -116,7 +116,7 @@ async def on_reaction_add(reaction, user) -> None:
     # If reaction is in a channel where no one is playing, or if the person
     # adding the reactions is the bot, do nothing.
     if reaction.message.id not in IDS or \
-            user.id == 837837082948534272:
+            user.id == BOT_ID:
         return None
     curr_channel = IDS[reaction.message.id]
     channel = curr_channel[CHAN]
