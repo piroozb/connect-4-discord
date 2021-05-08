@@ -173,8 +173,8 @@ async def on_reaction_add(reaction, user) -> None:
     curr_board.drop_piece(r, EMOTES[reaction.emoji], curr_piece)
     # reset afk timer
     curr_channel[TIMER] = 0
-    # Checks if player has won. If they did, sends a winner message
-    # and then removes the board from IDS
+    # Checks if there are no more positions to drop a piece, then ends the game
+    # as a draw if this is true.
     if len(curr_board.get_valid_locations()) == 0:
         del IDS[reaction.message.id]
         embed = discord.Embed(title="It's a draw!",
@@ -183,6 +183,8 @@ async def on_reaction_add(reaction, user) -> None:
                             '729fc07335063f9d8a23002a71fdb0a8/tenor.gif')
         await channel.send(embed=embed)
         return None
+    # Checks if there is a connect 4, and if so, sends a winner message and
+    # removes the game from IDS
     if curr_board.is_win(curr_piece):
         curr_color = P_DICT[player_red][2]
         embed = discord.Embed(title=f'{curr_player.display_name} wins!',
@@ -198,6 +200,7 @@ async def on_reaction_add(reaction, user) -> None:
                                             + f'\n<@{curr_player.id}> wins!')
         del IDS[reaction.message.id]
         return None
+    # If there is no connect 4, print the board and go to the next turn.
     else:
         await reaction.message.edit(content=f':red_circle: '
                                             f'{curr_channel[1].display_name}'
@@ -208,42 +211,47 @@ async def on_reaction_add(reaction, user) -> None:
                                             + f'\n Current player: '
                                               f'<@{other_player.id}>'
                                             f'\n :flag_white:: Forfeit')
+    # If playing with bot, run the minimax algorithm and then drop the piece
+    # the algorithm has chosen.
     if other_player.bot:
         await asyncio.sleep(1)
-        col, minimax_score = curr_board.minimax(4, -math.inf, math.inf, True)
+        # Goes 6 layers deep into the tree
+        col, minimax_score = curr_board.minimax(6, -math.inf, math.inf, True)
         row = curr_board.get_valid_locations()[col]
-        if curr_board.is_valid_location(row, col):
-            curr_board.drop_piece(row, col, AI_PIECE)
-            curr_channel[TIMER] = 0
-
-            if curr_board.is_win(curr_channel[CURR_P]):
-                other_color = P_DICT[not player_red][2]
-                embed = discord.Embed(title=f'{other_player.display_name} '
-                                            f'wins!', color=other_color)
-                embed.set_image(url=random.choice(GIFS))
-                await channel.send(embed=embed)
-                await reaction.message.edit(
-                    content=f':red_circle: '
-                            f'{curr_channel[1].display_name}'
-                            f' :crossed_swords: '
-                            f'{curr_channel[2].display_name}'
-                            f' :yellow_circle: \n'
-                            + TOP_NUM + curr_board.print_board()
-                            + f'\n<@{other_player.id}> wins!')
-                del IDS[reaction.message.id]
-            else:
-                await reaction.message.edit(
-                    content=f':red_circle: '
-                            f'{curr_channel[1].display_name}'
-                            f' :crossed_swords: '
-                            f'{curr_channel[2].display_name}'
-                            f' :yellow_circle: \n'
-                            + TOP_NUM + curr_board.print_board()
-                            + f'\n Current player:'
-                            f' <@{curr_player.id}>'
-                            f'\n :flag_white:: Forfeit')
-            # changes current piece back to what it was before
-            curr_channel[CURR_P] = curr_piece
+        # drop the piece into the board
+        curr_board.drop_piece(row, col, AI_PIECE)
+        curr_channel[TIMER] = 0
+        # If bot plays winning move, send winning message and delete
+        # game from IDS.
+        if curr_board.is_win(curr_channel[CURR_P]):
+            other_color = P_DICT[not player_red][2]
+            embed = discord.Embed(title=f'{other_player.display_name} '
+                                        f'wins!', color=other_color)
+            embed.set_image(url=random.choice(GIFS))
+            await channel.send(embed=embed)
+            await reaction.message.edit(
+                content=f':red_circle: '
+                        f'{curr_channel[1].display_name}'
+                        f' :crossed_swords: '
+                        f'{curr_channel[2].display_name}'
+                        f' :yellow_circle: \n'
+                        + TOP_NUM + curr_board.print_board()
+                        + f'\n<@{other_player.id}> wins!')
+            del IDS[reaction.message.id]
+        # Otherwise, just print the board
+        else:
+            await reaction.message.edit(
+                content=f':red_circle: '
+                        f'{curr_channel[1].display_name}'
+                        f' :crossed_swords: '
+                        f'{curr_channel[2].display_name}'
+                        f' :yellow_circle: \n'
+                        + TOP_NUM + curr_board.print_board()
+                        + f'\n Current player:'
+                        f' <@{curr_player.id}>'
+                        f'\n :flag_white:: Forfeit')
+        # changes current piece back to user
+        curr_channel[CURR_P] = curr_piece
 
 
 keep_alive()
