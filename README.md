@@ -23,3 +23,5 @@ Afterwards, create a file in the same directory named .env. Then put the followi
 TOKEN=<YOUR BOT TOKEN>
 ```
 Finally, run the main.py file.
+
+[Submitted to RUHacks 2021](https://devpost.com/software/discord-connect-4)
