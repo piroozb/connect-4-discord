@@ -1,5 +1,8 @@
 <p align="center">
    <img src="https://i.imgur.com/nv9sd6U.png" width="500" alt=".connect 4 logo">
+   <br>
+   <a align="center" href="https://youtu.be/gTjZy1gjJ44"><h3>Check out the video</h3></a>
+  <a align="center" href="https://youtu.be/gTjZy1gjJ44"> <img src="https://i.imgur.com/VHHWYlg.jpeg" width="500" alt=".connect 4 logo"> </a>
 </p>
 <h3 align="center">
    An open sourced connect 4 discord bot. <br/>
